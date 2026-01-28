@@ -11,11 +11,11 @@ import (
 	"time"
 )
 
-var endpoints = [5]string{"accessories", "outdoor", "jackets & coats", "sports wear", "artillery"}
+var endpoints = [5]string{"accessories", "outdoor", "jackets & coats", "sports wear", "perfume"}
 
 func MainScreen() string {
 	for i, item := range endpoints {
-		fmt.Printf("%d, %s\n", i+1, item)
+		fmt.Printf("%d. %s\n", i+1, item)
 	}
 
 	var choice int

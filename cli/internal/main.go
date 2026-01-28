@@ -1,21 +1,19 @@
 package internal
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"time"
 )
 
-var endpoints = [5]string{"accessories", "outdoor", "jackets & coats", "sports wear", "artillery"}
+var endpoints = [5]string{"accessories", "outdoor", "outerwear", "sports wear", "perfume"}
 
 func MainScreen() string {
 	for i, item := range endpoints {
-		fmt.Printf("%d, %s\n", i+1, item)
+		fmt.Printf("%d. %s\n", i+1, item)
 	}
 
 	var choice int
@@ -23,7 +21,7 @@ func MainScreen() string {
 		fmt.Scanf("%d", &choice)
 
 		choice = choice - 1
-		if choice < 0 || choice > len(endpoints) {
+		if choice < 0 || choice >= len(endpoints) {
 			fmt.Printf("select a valid option within range sir\n")
 		} else {
 			break
@@ -42,16 +40,15 @@ func QueryServer(item string) ([]byte, error) {
 		return []byte{}, fmt.Errorf("error in parsing server_addr: %w ", err)
 	}
 
-	targetEndpoint, err := addr.Parse(fmt.Sprintf("/%s", item))
+	targetEndpoint := addr.JoinPath(item)
+
 	if err != nil {
 		return []byte{}, fmt.Errorf("error in parsing for endpoint: %w ", err)
 	}
 
 	client := &http.Client{}
-	var body []byte
-	reader := bytes.NewReader(body)
 
-	req, err := http.NewRequestWithContext(ctx, "GET", targetEndpoint.String(), reader)
+	req, err := http.NewRequestWithContext(ctx, "GET", targetEndpoint.String(), nil)
 	if err != nil {
 		return []byte{}, fmt.Errorf("error in creating new_request: %w ", err)
 	}
@@ -67,7 +64,6 @@ func QueryServer(item string) ([]byte, error) {
 		return []byte{}, fmt.Errorf("error in reading response_body: %w ", err)
 	}
 
-	log.Println("successfully queried server")
 	return content, nil
 }
 
